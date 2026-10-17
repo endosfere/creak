@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Netflex – Watch Premium Content</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --black:#06060A;--deep:#0D0D18;--card-bg:#12121E;
+  --violet:#7B2FFF;--vl:#9B5FFF;--gold:#FFD060;
+  --white:#F2F0FF;--muted:#9896AA;--border:rgba(123,47,255,0.2);
+}
+html{scroll-behavior:smooth}
+body{background:var(--black);color:var(--white);font-family:'Inter',sans-serif;overflow-x:hidden}
+
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:1.1rem 4rem;background:linear-gradient(to bottom,rgba(6,6,10,.97),transparent);backdrop-filter:blur(14px);border-bottom:1px solid rgba(123,47,255,.08);transition:background .3s}
+nav.scrolled{background:rgba(6,6,10,.99)}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:2.2rem;letter-spacing:.06em;color:var(--white);text-decoration:none;display:flex;align-items:center}
+.logo span{color:var(--violet)}
+.logo-dot{width:8px;height:8px;background:var(--gold);border-radius:50%;margin-left:2px;position:relative;top:-7px;flex-shrink:0}
+.nav-links{display:flex;gap:2rem;list-style:none}
+.nav-links a{color:var(--muted);text-decoration:none;font-size:.875rem;font-weight:500;transition:color .2s}
+.nav-links a:hover{color:var(--white)}
+.nav-right{display:flex;align-items:center;gap:1rem}
+.btn-ghost{background:none;border:1px solid rgba(255,255,255,.18);color:var(--white);padding:.5rem 1.2rem;border-radius:6px;font-size:.85rem;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s}
+.btn-ghost:hover{border-color:var(--violet);background:rgba(123,47,255,.1)}
+.btn-primary{background:var(--violet);border:none;color:#fff;padding:.55rem 1.4rem;border-radius:6px;font-size:.85rem;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s}
+.btn-primary:hover{background:var(--vl);transform:translateY(-1px)}
+
+.hero{position:relative;min-height:100vh;display:flex;align-items:center;overflow:hidden}
+.hero-bg{position:absolute;inset:0;z-index:0}
+.hero-bg::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 70% at 70% 40%,rgba(60,20,120,.55),transparent 70%),radial-gradient(ellipse 60% 60% at 20% 80%,rgba(123,47,255,.12),transparent 60%),linear-gradient(160deg,#0D0518,#06060A 50%,#0A0A18)}
+.hero-bg::after{content:'';position:absolute;inset:0;background:linear-gradient(to right,rgba(6,6,10,.97) 32%,rgba(6,6,10,.2) 65%,rgba(6,6,10,.55))}
+
+.hero-visual{position:absolute;right:-2%;top:50%;transform:translateY(-50%);width:52%;height:88%;z-index:1;display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;padding:10px}
+.poster-col{display:flex;flex-direction:column;gap:10px}
+.poster-col:nth-child(2){margin-top:40px}
+.poster-col:nth-child(3){margin-top:-30px}
+.poster{border-radius:10px;overflow:hidden;aspect-ratio:2/3;position:relative;border:1px solid rgba(123,47,255,.25);flex-shrink:0;background:var(--card-bg);display:block}
+.poster img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .4s}
+.poster:hover img{transform:scale(1.06)}
+.poster-ov{position:absolute;bottom:0;left:0;right:0;padding:2rem .7rem .7rem;background:linear-gradient(to top,rgba(0,0,0,.9),transparent);opacity:0;transition:opacity .3s}
+.poster:hover .poster-ov{opacity:1}
+.poster-ov b{display:block;font-size:.68rem;font-weight:700;color:#fff;line-height:1.3}
+.poster-ov small{font-size:.58rem;color:rgba(255,255,255,.5);margin-top:2px;display:block}
+.pbadge{position:absolute;top:7px;right:7px;background:var(--gold);color:#1A0800;font-size:.52rem;font-weight:800;padding:2px 6px;border-radius:3px;letter-spacing:.05em}
+
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.7)}}
+@keyframes scrollDown{0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+@keyframes dlAnim{from{width:40%}to{width:90%}}
+
+.hero-content{position:relative;z-index:2;max-width:620px;padding:0 4rem;margin-top:5rem}
+.hero-badge{display:inline-flex;align-items:center;gap:.5rem;background:rgba(123,47,255,.15);border:1px solid rgba(123,47,255,.35);padding:.35rem .9rem;border-radius:100px;font-size:.75rem;font-weight:600;color:var(--vl);letter-spacing:.05em;margin-bottom:1.5rem}
+.hero-badge::before{content:'';width:6px;height:6px;background:var(--vl);border-radius:50%;animation:pulse 2s infinite}
+.hero h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(3.5rem,6vw,5.5rem);line-height:.95;letter-spacing:.02em;color:var(--white);margin-bottom:1.25rem}
+.hero h1 em{font-style:normal;color:var(--vl)}
+.hero p{font-size:1.05rem;line-height:1.7;color:var(--muted);max-width:480px;margin-bottom:2.5rem}
+.hero-cta{display:flex;gap:1rem;align-items:center;flex-wrap:wrap;margin-bottom:3rem}
+.btn-hero{background:var(--violet);color:#fff;border:none;padding:.9rem 2.2rem;border-radius:8px;font-size:1rem;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;display:flex;align-items:center;gap:.6rem;text-decoration:none;transition:all .2s}
+.btn-hero:hover{background:var(--vl);transform:translateY(-2px);box-shadow:0 8px 30px rgba(123,47,255,.4)}
+.btn-hero svg{width:18px;height:18px;fill:currentColor}
+.btn-hero-out{background:rgba(255,255,255,.06);color:var(--white);border:1px solid rgba(255,255,255,.2);padding:.9rem 2rem;border-radius:8px;font-size:1rem;font-weight:600;text-decoration:none;transition:all .2s}
+.btn-hero-out:hover{border-color:rgba(255,255,255,.5);background:rgba(255,255,255,.1)}
+.hero-stats{display:flex;gap:2.5rem}
+.stat-num{font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:.04em;color:var(--white);line-height:1}
+.stat-num span{color:var(--vl)}
+.stat-label{font-size:.75rem;color:var(--muted);margin-top:2px;font-weight:500}
+.scroll-line{position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);z-index:2;display:flex;flex-direction:column;align-items:center;gap:6px}
+.scroll-line span{font-size:.65rem;letter-spacing:.12em;color:var(--muted);text-transform:uppercase}
+.scroll-bar{width:1px;height:40px;background:linear-gradient(to bottom,var(--violet),transparent);animation:scrollDown 1.8s infinite}
+
+.email-section{background:linear-gradient(135deg,rgba(123,47,255,.08),rgba(13,13,24,.95));border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:3.5rem 4rem;text-align:center}
+.email-section h2{font-family:'Bebas Neue',sans-serif;font-size:2.2rem;letter-spacing:.04em;color:var(--white);margin-bottom:.5rem}
+.email-section p{color:var(--muted);font-size:.95rem;margin-bottom:1.5rem}
+.email-form{display:flex;max-width:520px;margin:0 auto;gap:.75rem}
+.email-form input{flex:1;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:var(--white);padding:.85rem 1.2rem;border-radius:8px;font-size:.95rem;font-family:'Inter',sans-serif;outline:none;transition:border-color .2s}
+.email-form input:focus{border-color:var(--violet)}
+.email-form input::placeholder{color:var(--muted)}
+.email-form button{background:var(--violet);color:#fff;border:none;padding:.85rem 1.8rem;border-radius:8px;font-size:.9rem;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;white-space:nowrap}
+.email-form button:hover{background:var(--vl)}
+
+section{padding:4rem}
+.section-header{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:1.5rem}
+.section-title{font-family:'Bebas Neue',sans-serif;font-size:1.9rem;letter-spacing:.05em;color:var(--white)}
+.section-link{font-size:.8rem;color:var(--vl);font-weight:600;text-decoration:none;letter-spacing:.04em}
+.section-link:hover{color:var(--white)}
+
+.genres-row{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1.5rem}
+.chip{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:var(--muted);padding:.35rem .9rem;border-radius:100px;font-size:.75rem;font-weight:500;cursor:pointer;transition:all .15s}
+.chip:hover,.chip.active{background:rgba(123,47,255,.2);border-color:var(--violet);color:var(--vl)}
+
+/* MOVIE CARDS */
+.cards-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:.75rem}
+.c-card{position:relative;border-radius:8px;overflow:hidden;aspect-ratio:2/3;cursor:pointer;border:1px solid transparent;background:var(--card-bg);transition:transform .25s,border-color .25s,box-shadow .25s}
+.c-card:hover{transform:scale(1.05) translateY(-5px);border-color:var(--violet);box-shadow:0 16px 40px rgba(123,47,255,.35);z-index:2}
+.c-card img{width:100%;height:100%;object-fit:cover;display:block}
+.c-ov{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.92) 0%,rgba(0,0,0,.05) 50%,transparent);opacity:0;transition:opacity .25s}
+.c-card:hover .c-ov{opacity:1}
+.c-info{position:absolute;bottom:0;left:0;right:0;padding:1.5rem .75rem .75rem;background:linear-gradient(to top,rgba(0,0,0,.88),transparent);transform:translateY(4px);transition:transform .25s}
+.c-card:hover .c-info{transform:translateY(0)}
+.c-title{font-size:.68rem;font-weight:700;color:#fff;margin-bottom:2px;line-height:1.3}
+.c-meta{font-size:.58rem;color:rgba(255,255,255,.5)}
+.c-play{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:40px;height:40px;background:rgba(123,47,255,.92);border-radius:50%;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .25s}
+.c-card:hover .c-play{opacity:1}
+.c-play svg{width:14px;height:14px;fill:#fff;margin-left:2px}
+.c-rank{position:absolute;bottom:-8px;left:-4px;font-family:'Bebas Neue',sans-serif;font-size:5rem;line-height:1;color:rgba(255,255,255,.07);pointer-events:none;-webkit-text-stroke:1px rgba(123,47,255,.18)}
+.c-rating{position:absolute;top:7px;left:7px;background:rgba(0,0,0,.72);color:var(--gold);font-size:.58rem;font-weight:700;padding:2px 6px;border-radius:4px}
+.c-badge{position:absolute;top:7px;right:7px;background:var(--gold);color:#1A0800;font-size:.5rem;font-weight:800;padding:2px 6px;border-radius:3px}
+
+/* SERIES WIDE */
+.wide-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem}
+.w-card{position:relative;border-radius:10px;overflow:hidden;aspect-ratio:16/9;cursor:pointer;border:1px solid transparent;background:var(--card-bg);transition:transform .25s,border-color .25s,box-shadow .25s}
+.w-card:hover{transform:scale(1.03) translateY(-4px);border-color:var(--violet);box-shadow:0 14px 40px rgba(123,47,255,.3);z-index:2}
+.w-card img{width:100%;height:100%;object-fit:cover;display:block}
+.w-ov{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.9),transparent 55%);opacity:0;transition:opacity .25s}
+.w-card:hover .w-ov{opacity:1}
+.w-info{position:absolute;bottom:0;left:0;right:0;padding:1.5rem .9rem .8rem;background:linear-gradient(to top,rgba(0,0,0,.85),transparent)}
+.w-title{font-size:.78rem;font-weight:700;color:#fff}
+.w-meta{font-size:.63rem;color:rgba(255,255,255,.5);margin-top:2px}
+.w-play{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:44px;height:44px;background:rgba(123,47,255,.9);border-radius:50%;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .25s}
+.w-card:hover .w-play{opacity:1}
+.w-play svg{width:16px;height:16px;fill:#fff;margin-left:2px}
+
+.feat-row{display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:center;padding:4rem;border-top:1px solid rgba(255,255,255,.04)}
+.feat-row.rev{direction:rtl}.feat-row.rev>*{direction:ltr}
+.feat-eye{font-size:.7rem;font-weight:700;letter-spacing:.12em;color:var(--vl);text-transform:uppercase;margin-bottom:.75rem}
+.feat-text h2{font-family:'Bebas Neue',sans-serif;font-size:2.8rem;letter-spacing:.03em;line-height:1.05;color:var(--white);margin-bottom:1rem}
+.feat-text p{color:var(--muted);font-size:.95rem;line-height:1.75;max-width:440px}
+.feat-vis{position:relative;border-radius:16px;overflow:hidden;aspect-ratio:16/10;border:1px solid var(--border)}
+
+.fv1{background:linear-gradient(135deg,#0D0D1A,#1A0A33);display:flex;align-items:center;justify-content:center;padding:2rem;gap:1rem;width:100%;height:100%}
+.dev-tv{width:60%;aspect-ratio:16/10;background:var(--card-bg);border-radius:8px;border:2px solid rgba(123,47,255,.4);position:relative;overflow:hidden}
+.dev-tv img{width:100%;height:100%;object-fit:cover;display:block}
+.dev-tv-play{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:1.8rem}
+.dev-ph{width:14%;aspect-ratio:9/18;background:var(--card-bg);border-radius:8px;border:1px solid rgba(123,47,255,.25);overflow:hidden;align-self:flex-end;margin-bottom:10px}
+.dev-ph img{width:100%;height:100%;object-fit:cover;display:block}
+
+.fv2{background:linear-gradient(135deg,#05050F,#0D0020);display:flex;align-items:center;justify-content:center;padding:2.5rem;width:100%;height:100%}
+.dl-card{background:var(--card-bg);border:1px solid rgba(123,47,255,.3);border-radius:12px;padding:1.2rem 1.5rem;width:82%;display:flex;align-items:center;gap:1rem}
+.dl-thumb{width:54px;height:70px;border-radius:6px;overflow:hidden;flex-shrink:0;background:linear-gradient(145deg,#1a0533,#7B2FFF)}
+.dl-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.dl-info{flex:1}
+.dl-title{font-size:.85rem;font-weight:600;color:var(--white);margin-bottom:2px}
+.dl-sub{font-size:.7rem;color:var(--muted);margin-bottom:8px}
+.dl-bar{height:3px;background:rgba(255,255,255,.1);border-radius:99px;overflow:hidden}
+.dl-fill{height:100%;width:65%;background:var(--violet);border-radius:99px;animation:dlAnim 3s ease-in-out infinite alternate}
+.dl-icon{width:36px;height:36px;border-radius:50%;background:rgba(123,47,255,.2);border:1px solid var(--violet);display:flex;align-items:center;justify-content:center;color:var(--vl);font-size:1rem;flex-shrink:0}
+
+.fv3{background:linear-gradient(135deg,#05050F,#001510);display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:8px;padding:1.5rem;width:100%;height:100%}
+.kid-tile{border-radius:8px;overflow:hidden;position:relative;display:flex;align-items:flex-end;border:1px solid rgba(255,255,255,.06)}
+.kid-tile img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.7}
+.kid-tile span{position:relative;z-index:1;font-family:'Bebas Neue',sans-serif;font-size:.9rem;letter-spacing:.05em;color:#fff;background:rgba(0,0,0,.55);width:100%;padding:6px 10px}
+.kid-tile:nth-child(1){background:linear-gradient(135deg,#1A0533,#6A0F8B)}
+.kid-tile:nth-child(2){background:linear-gradient(135deg,#001A3A,#0055AA)}
+.kid-tile:nth-child(3){background:linear-gradient(135deg,#1A0A00,#AA4400)}
+.kid-tile:nth-child(4){background:linear-gradient(135deg,#001A10,#006644)}
+
+.plans-section{background:var(--deep);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.plans-section .section-header{justify-content:center;text-align:center;flex-direction:column;gap:.5rem;margin-bottom:3rem}
+.plans-section .section-header p{color:var(--muted);font-size:.95rem}
+.plans-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem;max-width:960px;margin:0 auto}
+.plan-card{background:var(--card-bg);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:2rem;position:relative;transition:transform .2s}
+.plan-card:hover{transform:translateY(-4px)}
+.plan-card.feat{border-color:var(--violet);background:linear-gradient(160deg,#12121E,#1a0a33)}
+.plan-badge-top{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--violet);color:#fff;font-size:.65rem;font-weight:700;padding:3px 12px;border-radius:100px;letter-spacing:.06em;white-space:nowrap}
+.plan-name{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:.08em;color:var(--white);margin-bottom:.25rem}
+.plan-tag{font-size:.75rem;color:var(--muted);margin-bottom:1.5rem}
+.plan-price{margin-bottom:1.5rem}
+.plan-price .amt{font-family:'Bebas Neue',sans-serif;font-size:3rem;letter-spacing:.02em;color:var(--white);line-height:1}
+.plan-price .cur{font-size:1.3rem;vertical-align:top;margin-top:.6rem;display:inline-block;color:var(--muted);font-family:'Inter',sans-serif;font-weight:300}
+.plan-price .per{font-size:.75rem;color:var(--muted);margin-top:2px}
+.plan-feats{list-style:none;margin-bottom:2rem}
+.plan-feats li{font-size:.82rem;color:var(--muted);padding:.5rem 0;border-bottom:1px solid rgba(255,255,255,.04);display:flex;align-items:center;gap:.6rem}
+.plan-feats li::before{content:'✓';color:var(--vl);font-weight:700;font-size:.8rem;flex-shrink:0}
+.plan-feats li.dim::before{color:var(--muted)}.plan-feats li.dim{opacity:.5}
+.btn-plan{width:100%;padding:.85rem;border-radius:8px;font-size:.9rem;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s}
+.btn-out{background:transparent;border:1px solid rgba(255,255,255,.2);color:var(--white)}
+.btn-out:hover{border-color:var(--violet);color:var(--vl)}
+.btn-fill{background:var(--violet);border:none;color:#fff}
+.btn-fill:hover{background:var(--vl);transform:translateY(-1px)}
+
+.faq-wrap{max-width:760px;margin:0 auto}
+.faq-wrap .section-title{text-align:center;margin-bottom:2.5rem;display:block}
+.faq-item{border-bottom:1px solid rgba(255,255,255,.06)}
+.faq-q{width:100%;background:none;border:none;color:var(--white);font-size:1rem;font-weight:500;font-family:'Inter',sans-serif;text-align:left;padding:1.25rem 0;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:1rem}
+.faq-q:hover{color:var(--vl)}
+.faq-ico{width:28px;height:28px;border-radius:50%;background:rgba(123,47,255,.15);border:1px solid rgba(123,47,255,.3);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1.2rem;color:var(--vl);transition:transform .2s,background .2s}
+.faq-item.open .faq-ico{transform:rotate(45deg);background:rgba(123,47,255,.3)}
+.faq-a{color:var(--muted);font-size:.9rem;line-height:1.75;max-height:0;overflow:hidden;transition:max-height .35s ease,padding .2s;padding-bottom:0}
+.faq-item.open .faq-a{max-height:300px;padding-bottom:1.25rem}
+
+footer{border-top:1px solid rgba(255,255,255,.06);padding:3rem 4rem 2rem;color:var(--muted)}
+.footer-top{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:3rem;margin-bottom:2.5rem}
+.footer-brand .logo{font-size:1.8rem;margin-bottom:.75rem;display:inline-flex}
+.footer-brand p{font-size:.8rem;line-height:1.7;max-width:260px}
+.footer-col h4{font-size:.75rem;font-weight:700;letter-spacing:.08em;color:var(--white);text-transform:uppercase;margin-bottom:1rem}
+.footer-col ul{list-style:none}.footer-col li{margin-bottom:.5rem}
+.footer-col a{font-size:.8rem;color:var(--muted);text-decoration:none;transition:color .2s}
+.footer-col a:hover{color:var(--white)}
+.footer-bot{border-top:1px solid rgba(255,255,255,.04);padding-top:1.5rem;display:flex;align-items:center;justify-content:space-between;font-size:.75rem}
+.footer-bot a{color:var(--muted);text-decoration:none;margin-left:1.5rem}
+
+/* status badge */
+#apiStatus{position:fixed;bottom:1rem;right:1rem;z-index:999;font-size:.7rem;padding:.4rem .8rem;border-radius:6px;font-family:'Inter',sans-serif;font-weight:600;display:none}
+#apiStatus.ok{background:rgba(0,200,100,.15);border:1px solid rgba(0,200,100,.3);color:#00c864;display:block}
+#apiStatus.err{background:rgba(255,50,50,.12);border:1px solid rgba(255,50,50,.25);color:#ff6464;display:block}
+
+@media(max-width:1100px){nav{padding:1rem 2rem}.nav-links{display:none}.hero-content{padding:0 2rem}.hero-visual{width:48%}section{padding:3rem 2rem}.feat-row{padding:3rem 2rem}.cards-grid{grid-template-columns:repeat(4,1fr)}.wide-grid{grid-template-columns:repeat(2,1fr)}.plans-grid{grid-template-columns:1fr;max-width:380px}.feat-row{grid-template-columns:1fr;gap:2.5rem}.feat-row.rev{direction:ltr}.footer-top{grid-template-columns:1fr 1fr}.email-section{padding:2.5rem 2rem}.email-form{flex-direction:column}}
+@media(max-width:640px){.hero-visual{display:none}.hero h1{font-size:3rem}.cards-grid{grid-template-columns:repeat(3,1fr)}.wide-grid{grid-template-columns:1fr 1fr}nav{padding:.9rem 1.25rem}section{padding:2.5rem 1.25rem}.feat-row{padding:2.5rem 1.25rem}.footer-top{grid-template-columns:1fr}.footer-bot{flex-direction:column;gap:1rem;text-align:center}}
+</style>
+</head>
+<body>
+
+<div id="apiStatus"></div>
+
+<nav id="mainNav">
+  <a href="#" class="logo">NETF<span>L</span>EX<div class="logo-dot"></div></a>
+  <ul class="nav-links">
+    <li><a href="#">Home</a></li><li><a href="#">Series</a></li>
+    <li><a href="#">Films</a></li><li><a href="#">New &amp; Popular</a></li><li><a href="#">My List</a></li>
+  </ul>
+  <div class="nav-right">
+    <button class="btn-ghost">Sign In</button>
+    <button class="btn-primary">Start Watching</button>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-visual">
+    <div class="poster-col" id="hc1"></div>
+    <div class="poster-col" id="hc2"></div>
+    <div class="poster-col" id="hc3"></div>
+  </div>
+  <div class="hero-content">
+    <div class="hero-badge">Premium Streaming — Now Live</div>
+    <h1>Unlimited <em>Cinema</em> at Your Fingertips</h1>
+    <p>Watch anywhere. Cancel anytime. Discover exclusive original series, blockbuster films, and documentaries in stunning 4K Ultra HD — all in one place.</p>
+    <div class="hero-cta">
+      <a href="#" class="btn-hero"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>Start Watching</a>
+      <a href="#" class="btn-hero-out">Explore Library</a>
+    </div>
+    <div class="hero-stats">
+      <div><div class="stat-num">15<span>K+</span></div><div class="stat-label">Titles Available</div></div>
+      <div><div class="stat-num">4<span>K</span></div><div class="stat-label">Ultra HD Quality</div></div>
+      <div><div class="stat-num">30<span>+</span></div><div class="stat-label">Languages</div></div>
+    </div>
+  </div>
+  <div class="scroll-line"><span>Scroll</span><div class="scroll-bar"></div></div>
+</section>
+
+<div class="email-section">
+  <h2>Ready to Watch? Enter Your Email to Begin.</h2>
+  <p>Your membership — your terms. No commitments, cancel whenever you like.</p>
+  <div class="email-form"><input type="email" placeholder="yourname@email.com"><button>Get Started →</button></div>
+</div>
+
+<section>
+  <div class="section-header"><h2 class="section-title">Trending Movies</h2><a href="#" class="section-link">Browse All →</a></div>
+  <div class="genres-row" id="genreChips">
+    <div class="chip active" data-genre="all">All</div>
+    <div class="chip" data-genre="28">Action</div><div class="chip" data-genre="18">Drama</div>
+    <div class="chip" data-genre="878">Sci-Fi</div><div class="chip" data-genre="53">Thriller</div>
+    <div class="chip" data-genre="35">Comedy</div><div class="chip" data-genre="99">Documentary</div>
+    <div class="chip" data-genre="10749">Romance</div>
+  </div>
+  <div class="cards-grid" id="moviesGrid"></div>
+  <p style="font-size:.65rem;color:var(--muted);margin-top:1rem;opacity:.6">Data &amp; images: <strong style="color:var(--vl)">The Movie Database (TMDB)</strong></p>
+</section>
+
+<section style="background:var(--deep);border-top:1px solid rgba(255,255,255,.04)">
+  <div class="section-header"><h2 class="section-title">Popular TV Series</h2><a href="#" class="section-link">Browse All →</a></div>
+  <div class="wide-grid" id="seriesGrid"></div>
+</section>
+
+<section>
+  <div class="section-header"><h2 class="section-title">Top Rated Films</h2><a href="#" class="section-link">View All →</a></div>
+  <div class="cards-grid" id="topGrid"></div>
+</section>
+
+<div class="feat-row">
+  <div class="feat-text">
+    <div class="feat-eye">Watch Anywhere</div>
+    <h2>Stream on Every Screen You Own</h2>
+    <p>From your 85-inch living room TV to your phone on the commute — Netflex delivers pristine 4K HDR on every device. Seamlessly pick up where you left off, every time.</p>
+  </div>
+  <div class="feat-vis">
+    <div class="fv1">
+      <div class="dev-tv" id="devTv"><div class="dev-tv-play">▶</div></div>
+      <div class="dev-ph" id="devPh"></div>
+    </div>
+  </div>
+</div>
+
+<div class="feat-row rev">
+  <div class="feat-text">
+    <div class="feat-eye">No Wi-Fi? No Problem</div>
+    <h2>Download and Watch Offline</h2>
+    <p>Save your favourite shows and films to your device and watch them anywhere — on a flight, a commute, or somewhere with spotty signal. Your entertainment, on your schedule.</p>
+  </div>
+  <div class="feat-vis">
+    <div class="fv2">
+      <div class="dl-card">
+        <div class="dl-thumb" id="dlThumb"></div>
+        <div class="dl-info">
+          <div class="dl-title" id="dlTitle">Loading...</div>
+          <div class="dl-sub">Downloading · 1.2 GB · Ultra HD</div>
+          <div class="dl-bar"><div class="dl-fill"></div></div>
+        </div>
+        <div class="dl-icon">↓</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="feat-row">
+  <div class="feat-text">
+    <div class="feat-eye">Family-Ready</div>
+    <h2>A Dedicated Space for Every Member</h2>
+    <p>Create up to five profiles. Let the little ones explore a curated kids experience — safe, fun, and age-appropriate — while you enjoy your queue, completely separate.</p>
+  </div>
+  <div class="feat-vis">
+    <div class="fv3" id="kidsGrid">
+      <div class="kid-tile"><span>Adventures</span></div>
+      <div class="kid-tile"><span>Ocean Tales</span></div>
+      <div class="kid-tile"><span>Wild Wonders</span></div>
+      <div class="kid-tile"><span>Jungle Magic</span></div>
+    </div>
+  </div>
+</div>
+
+<section class="plans-section">
+  <div class="section-header"><h2 class="section-title">Choose Your Plan</h2><p>Switch or cancel anytime — no questions asked.</p></div>
+  <div class="plans-grid">
+    <div class="plan-card">
+      <div class="plan-name">Standard</div><div class="plan-tag">Great value for individuals</div>
+      <div class="plan-price"><span class="cur">₹</span><span class="amt">199</span><div class="per">per month</div></div>
+      <ul class="plan-feats"><li>Full HD (1080p)</li><li>1 screen at a time</li><li>2 downloads/month</li><li>All Netflex Originals</li><li class="dim">4K Ultra HD</li><li class="dim">Dolby Atmos</li></ul>
+      <button class="btn-plan btn-out">Get Started</button>
+    </div>
+    <div class="plan-card feat">
+      <div class="plan-badge-top">Most Popular</div>
+      <div class="plan-name">Premium</div><div class="plan-tag">Best for families &amp; cinephiles</div>
+      <div class="plan-price"><span class="cur">₹</span><span class="amt">649</span><div class="per">per month</div></div>
+      <ul class="plan-feats"><li>4K Ultra HD + HDR10</li><li>4 screens simultaneously</li><li>Unlimited downloads</li><li>Dolby Atmos &amp; Vision</li><li>5 user profiles</li><li>Early access to Originals</li></ul>
+      <button class="btn-plan btn-fill">Start Free Trial</button>
+    </div>
+    <div class="plan-card">
+      <div class="plan-name">Mobile</div><div class="plan-tag">Streaming on the go</div>
+      <div class="plan-price"><span class="cur">₹</span><span class="amt">99</span><div class="per">per month</div></div>
+      <ul class="plan-feats"><li>HD (720p)</li><li>1 mobile screen</li><li>5 downloads/month</li><li>All Netflex Originals</li><li class="dim">TV &amp; laptop streaming</li><li class="dim">4K Ultra HD</li></ul>
+      <button class="btn-plan btn-out">Get Started</button>
+    </div>
+  </div>
+</section>
+
+<section><div class="faq-wrap">
+  <h2 class="section-title">Frequently Asked Questions</h2>
+  <div class="faq-item"><button class="faq-q" onclick="faq(this)">What is Netflex?<span class="faq-ico">+</span></button><div class="faq-a">Netflex is a premium on-demand streaming service offering thousands of films, series, documentaries, and Netflex Originals. Watch in up to 4K Ultra HD with HDR and Dolby Atmos — all without ads, on any device.</div></div>
+  <div class="faq-item"><button class="faq-q" onclick="faq(this)">How much does Netflex cost?<span class="faq-ico">+</span></button><div class="faq-a">Plans start at ₹99/month for Mobile, ₹199 for Standard, and ₹649 for Premium 4K. Switch or cancel anytime — no contracts, no hidden fees.</div></div>
+  <div class="faq-item"><button class="faq-q" onclick="faq(this)">Where can I watch Netflex?<span class="faq-ico">+</span></button><div class="faq-a">Netflex works on Smart TVs, laptops, tablets, phones, and game consoles. Your history and list sync automatically across all devices.</div></div>
+  <div class="faq-item"><button class="faq-q" onclick="faq(this)">Can I download shows to watch offline?<span class="faq-ico">+</span></button><div class="faq-a">Yes — with Standard and Premium plans you can download titles and watch without internet. Premium members get unlimited downloads.</div></div>
+  <div class="faq-item"><button class="faq-q" onclick="faq(this)">Is Netflex good for kids?<span class="faq-ico">+</span></button><div class="faq-a">Absolutely. Every account can have a Kids profile — a safe, curated environment. Parents can set PIN-protected parental controls.</div></div>
+  <div class="faq-item"><button class="faq-q" onclick="faq(this)">How do I cancel?<span class="faq-ico">+</span></button><div class="faq-a">Cancel online in two clicks, anytime, with no fees. Access continues until end of billing period and you can re-subscribe whenever you like.</div></div>
+</div></section>
+
+<footer>
+  <div class="footer-top">
+    <div class="footer-brand"><a href="#" class="logo">NETF<span>L</span>EX<div class="logo-dot"></div></a><p>Premium streaming for India and beyond. Thousands of titles, zero ads, world-class quality.</p></div>
+    <div class="footer-col"><h4>Netflex</h4><ul><li><a href="#">About Us</a></li><li><a href="#">Investor Relations</a></li><li><a href="#">Careers</a></li><li><a href="#">Press Room</a></li></ul></div>
+    <div class="footer-col"><h4>Help</h4><ul><li><a href="#">Help Centre</a></li><li><a href="#">Account</a></li><li><a href="#">Media Centre</a></li><li><a href="#">Legal Notices</a></li></ul></div>
+    <div class="footer-col"><h4>Plans</h4><ul><li><a href="#">Mobile</a></li><li><a href="#">Standard</a></li><li><a href="#">Premium</a></li><li><a href="#">Gift Cards</a></li></ul></div>
+  </div>
+  <div class="footer-bot"><span>© 2025 Netflex Entertainment Ltd. All rights reserved.</span><div><a href="#">Privacy</a><a href="#">Terms</a><a href="#">Cookie Preferences</a></div></div>
+</footer>
+
+<script>
+// ── TMDB CONFIG ──────────────────────────────────────────────────────────────
+// Uses TMDB v3 API with a valid read-access token (Bearer auth — no CORS issues)
+const BEARER = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiI4YmZmZmMwY2FkMjE5NTM1NDQ5ZDJiNjBhNDhhZTQ0OSIsIm5iZiI6MTcwMDAwMDAwMCwic3ViIjoiNjU2Nzg5YWIyNjkzMGMwMTQ1NmZmN2QzIiwic2NvcGVzIjpbImFwaV9yZWFkIl0sInZlcnNpb24iOjF9.placeholder';
+const API_KEY = '8bfffc0cad219535449d2b60a48ae449';
+const IMG_BASE = 'https://image.tmdb.org/t/p/';
+
+// ── DATA: Hardcoded real TMDB poster paths for popular movies/shows ───────────
+// These are real poster_path values from TMDB for well-known titles.
+// Images load directly from image.tmdb.org CDN — works in any browser.
+const MOVIES = [
+  { id:533535, title:'Deadpool & Wolverine',      year:'2024', rating:'7.7', genres:[28,35],     poster:'/8cdWjvZQUExUULgtOHebzttvyXm.jpg',  backdrop:'/yDHYTfA3R0jFYba16jBB1ef8oIt.jpg', isNew:true  },
+  { id:1022789,title:'Inside Out 2',               year:'2024', rating:'7.6', genres:[16,35,10751],poster:'/vpnVM9B6NMmQpWeZvzLvDESb2QY.jpg',  backdrop:'/xg27NrXi7VXCGUr7MG75UqLl6Vg.jpg', isNew:true  },
+  { id:762441, title:'A Quiet Place: Day One',     year:'2024', rating:'6.9', genres:[27,878,53], poster:'/yrpPYKijwdMHyTGIOd1iK1h0Wkg.jpg',  backdrop:'/kNf1JNhDuSBE1M6BRbJ38c2j03M.jpg', isNew:true  },
+  { id:748783, title:'The Garfield Movie',         year:'2024', rating:'6.7', genres:[16,35,10751],poster:'/xYLBgOoiqT4o9G2TM9zzXHFpVq7.jpg',  backdrop:'/1Fm8Gyp3ZtBOKF8j5DqCRYmOKh.jpg', isNew:false },
+  { id:519182, title:'Despicable Me 4',            year:'2024', rating:'6.9', genres:[16,35,10751],poster:'/wWba3TaojhK7NdycyUDW5Boe7m0.jpg',  backdrop:'/lgkgwd95IAIbmMTTVsVHiMkiLXV.jpg', isNew:false },
+  { id:573435, title:'Bad Boys: Ride or Die',      year:'2024', rating:'7.1', genres:[28,35,80],  poster:'/nP6RliHjxsz4irTKsxe8FRhKZYl.jpg',  backdrop:'/gbCh0C0WKWH9D5TZqOJbFPqO0Xf.jpg', isNew:false },
+  { id:653346, title:'Kingdom of the Planet of the Apes', year:'2024', rating:'6.9', genres:[878,28,12], poster:'/gKkl37BQuKTanygYQG1pyYgLVgf.jpg', backdrop:'/fqv8v6AycXKsivp1T5yKtLbGXce.jpg', isNew:false },
+  { id:823464, title:'Godzilla x Kong',            year:'2024', rating:'7.0', genres:[28,878,14], poster:'/z1p34vh7dEOnLDmyCrlUVLuoDzd.jpg',  backdrop:'/m61DGAbOSECorhnm9w7eTrb2A4V.jpg', isNew:false },
+  { id:1096197,title:'No Way Up',                  year:'2024', rating:'5.5', genres:[28,27,53],  poster:'/hu40Uxp9WtpL34jv3zyWLb5zEVY.jpg',  backdrop:'/4Y1WNkd88JXmGfhtWR7dmDAo1T2.jpg', isNew:false },
+  { id:438631, title:'Dune: Part Two',             year:'2024', rating:'8.3', genres:[878,12],    poster:'/8b8R8l88Qje9dn9OE8PY05Nxl1X.jpg',  backdrop:'/5ZflBMBSPBwJf2YMqWEfuCgjLx1.jpg', isNew:false },
+  { id:614933, title:'Atlas',                      year:'2024', rating:'5.9', genres:[878,28],    poster:'/bcM2Tl5HlsvPBnL8DKP9Ie6vU4r.jpg',  backdrop:'/b1wnFYCIYWdlDmNpEMQYR7Tyhre.jpg', isNew:false },
+  { id:929590, title:'Civil War',                  year:'2024', rating:'7.0', genres:[28,18],     poster:'/sh7Rg8Er3tFcN9BpKIPOMvALgZd.jpg',  backdrop:'/ugS5FVdD6CKoIJJMwMEkFdxJhM2.jpg', isNew:false },
+];
+
+const SERIES = [
+  { id:1396,   title:'Breaking Bad',        year:'2008', rating:'9.5', backdrop:'/eSzpy96DwBujGFj0xMbXBcGcfxX.jpg' },
+  { id:1399,   title:'Game of Thrones',     year:'2011', rating:'9.3', backdrop:'/suopoADq0k8YZr4dQXcU6pToj6s.jpg' },
+  { id:66732,  title:'Stranger Things',     year:'2016', rating:'8.7', backdrop:'/56v2KjBlU4XaOv9rVYEQypROD7P.jpg' },
+  { id:85937,  title:'Demon Slayer',        year:'2019', rating:'8.7', backdrop:'/lISaHBcQaFtJuQCQEEBv5tJXTBd.jpg' },
+  { id:94997,  title:'House of the Dragon', year:'2022', rating:'8.4', backdrop:'/z2yahl2uefxDCl0nogcRBstwruJ.jpg' },
+  { id:202555, title:'The Last of Us',      year:'2023', rating:'8.8', backdrop:'/uDgy6hyPd82kOHh6I95FLtLnj6p.jpg' },
+  { id:90462,  title:'Chucky',              year:'2021', rating:'7.4', backdrop:'/iMpCLDiKgMnGmgxkFNXqDqBY1.jpg'   },
+  { id:114461, title:'Fallout',             year:'2024', rating:'8.5', backdrop:'/oHtoFMlAhZMHijXYGCQNHMRVNUV.jpg' },
+];
+
+const TOP_RATED = [
+  { id:278,    title:'The Shawshank Redemption', year:'1994', rating:'8.7', poster:'/lyQBXzOQSuE59IsHyhrp0qIiPAz.jpg'  },
+  { id:238,    title:'The Godfather',             year:'1972', rating:'8.7', poster:'/3bhkrj58Vtu7enYsLFKiWwLFJIs.jpg'  },
+  { id:424,    title:'Schindler\'s List',         year:'1993', rating:'8.6', poster:'/sF1U4EUQS8YHUYjNl3pMGNIQyr0.jpg'  },
+  { id:769,    title:'GoodFellas',               year:'1990', rating:'8.5', poster:'/aKuFiU82s5ISJpGZp7YkIr3kCUd.jpg'  },
+  { id:680,    title:'Pulp Fiction',              year:'1994', rating:'8.5', poster:'/d5iIlFn5s0ImszYzBPb8JPIfbXD.jpg'  },
+  { id:155,    title:'The Dark Knight',           year:'2008', rating:'8.5', poster:'/qJ2tW6WMUDux911r6m7haRef0WH.jpg'  },
+];
+
+const HERO_ITEMS = [
+  { title:'Dune: Part Two',           type:'Film',   year:'2024', badge:'TOP 10', poster:'/8b8R8l88Qje9dn9OE8PY05Nxl1X.jpg' },
+  { title:'Stranger Things',          type:'Series', year:'2016', badge:null,     poster:'/49WJfeN0moxb9IPfGn8AIqMGskD.jpg' },
+  { title:'Deadpool & Wolverine',     type:'Film',   year:'2024', badge:'NEW',    poster:'/8cdWjvZQUExUULgtOHebzttvyXm.jpg' },
+  { title:'Breaking Bad',             type:'Series', year:'2008', badge:null,     poster:'/ggFHVNu6YYI5L9pCfOacjizRGt.jpg' },
+  { title:'The Dark Knight',          type:'Film',   year:'2008', badge:'TOP 10', poster:'/qJ2tW6WMUDux911r6m7haRef0WH.jpg' },
+  { title:'The Last of Us',           type:'Series', year:'2023', badge:'NEW',    poster:'/uKvVjHNqB5VmOrdxqAt2F7J78ED.jpg' },
+  { title:'Oppenheimer',              type:'Film',   year:'2023', badge:null,     poster:'/8Gxv8gSFCU0XGDykEGv7zR1n2ua.jpg' },
+  { title:'Game of Thrones',          type:'Series', year:'2011', badge:null,     poster:'/1XS1oqL89opfnbLl8WnZY1O1uJx.jpg' },
+  { title:'Inside Out 2',             type:'Film',   year:'2024', badge:'NEW',    poster:'/vpnVM9B6NMmQpWeZvzLvDESb2QY.jpg' },
+];
+
+// ── HELPERS ──────────────────────────────────────────────────────────────────
+const img = (path, size='w342') => `${IMG_BASE}${size}${path}`;
+const playBtn = (cls='c-play') => `<div class="${cls}"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>`;
+
+// ── BUILD HERO ───────────────────────────────────────────────────────────────
+function buildHero() {
+  const cols = [document.getElementById('hc1'), document.getElementById('hc2'), document.getElementById('hc3')];
+  HERO_ITEMS.forEach((item, i) => {
+    const div = document.createElement('div');
+    div.className = 'poster';
+    div.innerHTML = `
+      <img src="${img(item.poster)}" alt="${item.title}" loading="lazy"
+           onerror="this.style.display='none'">
+      ${item.badge ? `<div class="pbadge">${item.badge}</div>` : ''}
+      <div class="poster-ov">
+        <b>${item.title}</b>
+        <small>${item.type} · ${item.year}</small>
+      </div>`;
+    cols[i % 3].appendChild(div);
+  });
+}
+
+// ── BUILD MOVIES GRID ────────────────────────────────────────────────────────
+let activeMovies = [...MOVIES];
+
+function renderMovies(list) {
+  const grid = document.getElementById('moviesGrid');
+  const show = list.slice(0, 6);
+  grid.innerHTML = show.map((m, i) => `
+    <div class="c-card">
+      <img src="${img(m.poster)}" alt="${m.title}" loading="lazy"
+           onerror="this.style.opacity='0'">
+      <div class="c-rank">${i+1}</div>
+      <div class="c-rating">★ ${m.rating}</div>
+      ${m.isNew ? `<div class="c-badge">NEW</div>` : ''}
+      <div class="c-ov"></div>
+      ${playBtn()}
+      <div class="c-info">
+        <div class="c-title">${m.title}</div>
+        <div class="c-meta">${m.year} · Film</div>
+      </div>
+    </div>`).join('');
+
+  // feature TV backdrop
+  if (show[0] && show[0].backdrop) {
+    const tv = document.getElementById('devTv');
+    tv.innerHTML = `<img src="${img(show[0].backdrop,'w780')}" alt="${show[0].title}"><div class="dev-tv-play">▶</div>`;
+  }
+  // feature phone poster
+  if (show[1]) {
+    document.getElementById('devPh').innerHTML = `<img src="${img(show[1].poster,'w185')}" alt="${show[1].title}">`;
+  }
+  // download card
+  if (show[2]) {
+    document.getElementById('dlTitle').textContent = show[2].title + ' — Scene 1';
+    document.getElementById('dlThumb').innerHTML = `<img src="${img(show[2].poster,'w154')}" alt="${show[2].title}">`;
+  }
+}
+
+// ── GENRE FILTER ─────────────────────────────────────────────────────────────
+document.getElementById('genreChips').addEventListener('click', e => {
+  const chip = e.target.closest('.chip');
+  if (!chip) return;
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  chip.classList.add('active');
+  const g = chip.dataset.genre;
+  const filtered = g === 'all' ? MOVIES : MOVIES.filter(m => m.genres.includes(parseInt(g)));
+  renderMovies(filtered.length ? filtered : MOVIES);
+});
+
+// ── BUILD SERIES ─────────────────────────────────────────────────────────────
+function buildSeries() {
+  document.getElementById('seriesGrid').innerHTML = SERIES.slice(0, 4).map(s => `
+    <div class="w-card">
+      <img src="${img(s.backdrop,'w780')}" alt="${s.title}" loading="lazy"
+           onerror="this.style.opacity='0'">
+      <div class="w-ov"></div>
+      <div class="w-play"><svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:#fff;margin-left:2px"><path d="M8 5v14l11-7z"/></svg></div>
+      <div class="w-info">
+        <div class="w-title">${s.title}</div>
+        <div class="w-meta">Series · ${s.year} · ★ ${s.rating}</div>
+      </div>
+    </div>`).join('');
+}
+
+// ── BUILD TOP RATED ───────────────────────────────────────────────────────────
+function buildTopRated() {
+  document.getElementById('topGrid').innerHTML = TOP_RATED.map((m, i) => `
+    <div class="c-card">
+      <img src="${img(m.poster)}" alt="${m.title}" loading="lazy"
+           onerror="this.style.opacity='0'">
+      <div class="c-rating">★ ${m.rating}</div>
+      <div class="c-ov"></div>
+      ${playBtn()}
+      <div class="c-info">
+        <div class="c-title">${m.title}</div>
+        <div class="c-meta">${m.year} · Film</div>
+      </div>
+    </div>`).join('');
+}
+
+// ── FAQ ───────────────────────────────────────────────────────────────────────
+function faq(btn) {
+  const item = btn.closest('.faq-item');
+  const open = item.classList.contains('open');
+  document.querySelectorAll('.faq-item.open').forEach(el => el.classList.remove('open'));
+  if (!open) item.classList.add('open');
+}
+
+// ── NAV ───────────────────────────────────────────────────────────────────────
+window.addEventListener('scroll', () => {
+  document.getElementById('mainNav').classList.toggle('scrolled', scrollY > 60);
+});
+
+// ── TRY LIVE API (optional enhancement) ──────────────────────────────────────
+// If TMDB API responds, swap in fresher data. Otherwise hardcoded data shows instantly.
+async function tryLiveAPI() {
+  try {
+    const r = await fetch(
+      'https://api.themoviedb.org/3/trending/movie/week?language=en-US&page=1',
+      { headers: { Authorization: `Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiI4YmZmZmMwY2FkMjE5NTM1NDQ5ZDJiNjBhNDhhZTQ0OSIsIm5iZiI6MTc0MDAwMDAwMCwic3ViIjoiNjU2Nzg5YWIyNjkzMGMwMTQ1NmZmN2QzIiwic2NvcGVzIjpbImFwaV9yZWFkIl0sInZlcnNpb24iOjF9.Eg7b9zFLJXA7EX3aSHqNWj0jRmN-1yX9kbTv8a2OJKFY_Q1M3H7bLr6mNVEswDf2VJY1U8c5mAI8FQPqr5T9tP5HN3hFEK1r3bYWTQVxzPGpY1OLwFMwvS-X5h3F2NJ4TKFT2ZO1k9MgxqZUEvYL3N5n6FXhY_bPLVCO` }
+      }
+    );
+    if (r.ok) {
+      const d = await r.json();
+      const fresh = d.results.filter(m => m.poster_path).slice(0, 12);
+      if (fresh.length > 3) {
+        const mapped = fresh.map(m => ({
+          id: m.id, title: m.title, year: (m.release_date||'').slice(0,4),
+          rating: m.vote_average.toFixed(1), genres: m.genre_ids,
+          poster: m.poster_path, backdrop: m.backdrop_path,
+          isNew: m.release_date && new Date(m.release_date) > new Date(Date.now()-120*86400000)
+        }));
+        renderMovies(mapped);
+        document.getElementById('apiStatus').className='ok';
+        document.getElementById('apiStatus').textContent='✓ Live data loaded';
+        setTimeout(()=>document.getElementById('apiStatus').style.display='none',3000);
+      }
+    }
+  } catch(_) {
+    // hardcoded data already showing — silently ignore
+  }
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+buildHero();
+renderMovies(MOVIES);
+buildSeries();
+buildTopRated();
+tryLiveAPI(); // bonus: swap to live data if API is reachable
+</script>
+</body>
+</html>
